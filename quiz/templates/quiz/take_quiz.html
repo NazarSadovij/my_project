@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Пройти вікторину: {{ quiz.title }}</h1>
+<form method="post">
+  {% csrf_token %}
+  {% for question in questions %}
+    <div>
+      <strong>{{ forloop.counter }}. {{ question.text }}</strong>
+      {% for choice in question.choices.all %}
+        <div>
+          <input type="radio" name="{{ question.id }}" value="{{ choice.id }}">
+          {{ choice.text }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+  <button type="submit" class="btn btn-success mt-2">Завершити</button>
+</form>
+<a href="{% url 'quiz_detail' quiz.id %}" class="btn btn-secondary mt-3">Назад</a>
+{% endblock %}

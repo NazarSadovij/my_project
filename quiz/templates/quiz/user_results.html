@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Мої результати</h1>
+{% if results %}
+  <ul>
+    {% for result in results %}
+      <li>{{ result.quiz.title }}: {{ result.score }}/{{ result.total }} | {{ result.created_at|date:"d.m.Y H:i" }}</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>Ви ще не проходили жодної вікторини.</p>
+{% endif %}
+<a href="{% url 'home' %}" class="btn btn-primary mt-2">На головну</a>
+{% endblock %}

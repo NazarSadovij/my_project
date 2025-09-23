@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Додати варіант до питання: "{{ question.text }}"</h1>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-success">Додати</button>
+</form>
+<a href="{% url 'quiz_detail' question.quiz.id %}" class="btn btn-secondary mt-3">Назад</a>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Рейтинг для вікторини: {{ quiz.title }}</h1>
+<table>
+  <tr>
+    <th>Місце</th>
+    <th>Користувач</th>
+    <th>Результат</th>
+    <th>Дата</th>
+  </tr>
+  {% for result in results %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ result.user.username }}</td>
+      <td>{{ result.score }}/{{ result.total }}</td>
+      <td>{{ result.created_at|date:"d.m.Y H:i" }}</td>
+    </tr>
+  {% endfor %}
+</table>
+<a href="{% url 'quiz_detail' quiz.id %}" class="btn btn-secondary mt-2">Назад</a>
+{% endblock %}
