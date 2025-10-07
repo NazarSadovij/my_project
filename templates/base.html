@@ -8,13 +8,7 @@
 <body class="container mt-4">
 <nav class="mb-3">
     <a href="{% url 'home' %}" class="btn btn-primary">Головна</a>
-    {% if user.is_authenticated %}
-        <a href="{% url 'user_results' %}" class="btn btn-info">Мої результати</a>
-        <a href="{% url 'logout' %}" class="btn btn-warning">Вихід</a>
-    {% else %}
-        <a href="{% url 'login' %}" class="btn btn-success">Вхід</a>
-        <a href="{% url 'signup' %}" class="btn btn-secondary">Реєстрація</a>
-    {% endif %}
+
 </nav>
 {% block content %}{% endblock %}
 </body>
