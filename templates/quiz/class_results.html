@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>📊 Результати класу: {{ classroom.name }}</h2>
+    <hr>
+
+    {% if results %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Учень</th>
+                    <th>Вікторина</th>
+                    <th>Бал</th>
+                    <th>Макс</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in results %}
+                <tr>
+                    <td>{{ r.user.username }}</td>
+                    <td>{{ r.quiz.title }}</td>
+                    <td>{{ r.score }}</td>
+                    <td>{{ r.total }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Поки що ніхто не проходив вікторини.</p>
+    {% endif %}
+</div>
+{% endblock %}

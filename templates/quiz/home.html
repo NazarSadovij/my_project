@@ -1,12 +1,8 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% block title %}Головна{% endblock %}
 {% block content %}
-<h1>Всі вікторини</h1>
-<ul>
-  {% for quiz in quizzes %}
-    <li>
-      <a href="{% url 'quiz_detail' quiz.id %}">{{ quiz.title }}</a>
-    </li>
-  {% endfor %}
-</ul>
-<a href="{% url 'create_quiz' %}" class="btn btn-success">Створити вікторину</a>
+<div class="text-center mt-5">
+    <h1>Ласкаво просимо до системи вікторин!</h1>
+    <p class="mt-3">Будь ласка, увійдіть або зареєструйтесь, щоб продовжити.</p>
+</div>
 {% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>👩‍🏫 Панель вчителя</h2>
+    <hr>
+
+    <form method="POST" class="mb-3">
+        {% csrf_token %}
+        <div class="input-group">
+            <input type="text" name="class_name" placeholder="Назва нового класу" class="form-control" required>
+            <button type="submit" class="btn btn-success">Створити клас</button>
+        </div>
+    </form>
+
+    <h4>📚 Мої класи</h4>
+    {% if classes %}
+        <ul class="list-group mt-2">
+            {% for class in classes %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ class.name }}</strong><br>
+                        <small>Код: <code>{{ class.code }}</code></small>
+                    </div>
+                    <div>
+                        <a href="{% url 'class_results' class.id %}" class="btn btn-sm btn-primary">Результати</a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Немає створених класів</p>
+    {% endif %}
+</div>
+{% endblock %}

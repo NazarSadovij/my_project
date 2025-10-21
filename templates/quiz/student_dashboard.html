@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>👨‍🎓 Панель учня</h2>
+    <hr>
+
+    <form method="POST" class="mb-3">
+        {% csrf_token %}
+        <div class="input-group">
+            <input type="text" name="class_code" placeholder="Введіть код класу" class="form-control" required>
+            <button type="submit" class="btn btn-primary">Приєднатися</button>
+        </div>
+    </form>
+
+    <h4>📘 Мої класи</h4>
+    {% if classes %}
+        {% for class in classes %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5>{{ class.name }}</h5>
+                    <small>Вчитель: {{ class.teacher.username }}</small>
+                    <hr>
+                    <h6>Доступні вікторини:</h6>
+                    <ul>
+                        {% for quiz in class.quizzes.all %}
+                            <li>
+                                <a href="{% url 'take_quiz' quiz.id %}">{{ quiz.title }}</a>
+                                {% with res=quiz.results.filter(user=request.user).first %}
+                                    {% if res %}
+                                        <span class="badge bg-success ms-2">{{ res.score }}/{{ res.total }}</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </li>
+                        {% empty %}
+                            <li><em>Немає вікторин</em></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Ви ще не приєдналися до жодного класу.</p>
+    {% endif %}
+</div>
+{% endblock %}
