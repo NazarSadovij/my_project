@@ -1,14 +1,24 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+import random
+import string
+
 class Quiz(models.Model):
     title = models.CharField(max_length=200)
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True)
+    code = models.CharField(max_length=8, unique=True, blank=True)  
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+        if not self.code:
+            self.code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.title
+
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="questions")
@@ -31,14 +41,13 @@ class Choice(models.Model):
         return self.text
 
 class Result(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    score = models.IntegerField(default=0)
-    total = models.IntegerField(default=0)
+    player_name = models.CharField(max_length=100, blank=True)  # ← додали поле
+    score = models.IntegerField()
+    total = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        ordering = ["-score"]
-
     def __str__(self):
-        return f"{self.user.username} - {self.quiz.title} ({self.score}/{self.total})"
+        return f"{self.player_name or self.user.username} - {self.quiz.title}"
+

@@ -12,6 +12,18 @@ def quiz_detail(request, quiz_id):
     questions = quiz.questions.all()
     return render(request, "quiz/quiz_detail.html", {"quiz": quiz, "questions": questions})
 
+def join_quiz(request):
+    if request.method == "POST":
+        code = request.POST.get("code")
+        name = request.POST.get("name")
+        quiz = Quiz.objects.filter(code=code).first()
+        if quiz:
+            request.session["player_name"] = name  # зберігаємо ім’я гравця в сесії
+            return redirect("take_quiz", quiz_id=quiz.id)
+        else:
+            return render(request, "quiz/join_quiz.html", {"error": "Неправильний код"})
+    return render(request, "quiz/join_quiz.html")
+
 def create_quiz(request):
     if request.method == "POST":
         form = QuizForm(request.POST)
@@ -57,6 +69,7 @@ def take_quiz(request, quiz_id):
     if request.method == "POST":
         score = 0
         total = questions.count()
+
         for question in questions:
             selected = request.POST.get(str(question.id))
             if selected:
@@ -64,12 +77,26 @@ def take_quiz(request, quiz_id):
                 if choice:
                     score += 1
 
-        if request.user.is_authenticated:
-            Result.objects.create(user=request.user, quiz=quiz, score=score, total=total)
+        player_name = request.session.get("player_name", None)
 
-        return render(request, "quiz/result.html", {"quiz": quiz, "score": score, "total": total})
+        Result.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            quiz=quiz,
+            player_name=player_name or "",
+            score=score,
+            total=total,
+        )
 
-    return render(request, "quiz/take_quiz.html", {"quiz": quiz, "questions": questions})
+        return render(request, "quiz/result.html", {
+            "quiz": quiz,
+            "score": score,
+            "total": total
+        })
+
+    return render(request, "quiz/take_quiz.html", {
+        "quiz": quiz,
+        "questions": questions
+    })
 
 def leaderboard(request, quiz_id):
     quiz = get_object_or_404(Quiz, id=quiz_id)
@@ -80,3 +107,4 @@ def leaderboard(request, quiz_id):
 def user_results(request):
     results = Result.objects.filter(user=request.user).order_by('-created_at')
     return render(request, "quiz/user_results.html", {"results": results})
+

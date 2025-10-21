@@ -10,4 +10,6 @@ urlpatterns = [
     path("quiz/<int:quiz_id>/take/", views.take_quiz, name="take_quiz"),
     path("quiz/<int:quiz_id>/leaderboard/", views.leaderboard, name="leaderboard"),
     path("my-results/", views.user_results, name="user_results"),
+    path("join/", views.join_quiz, name="join_quiz"),
+
 ]
