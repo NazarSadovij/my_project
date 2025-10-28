@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 import random, string
 
 # --- Розширення користувача ---
@@ -8,7 +8,7 @@ class UserProfile(models.Model):
         ('teacher', 'Вчитель'),
         ('student', 'Учень'),
     ]
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='student')
 
     def __str__(self):
@@ -17,10 +17,10 @@ class UserProfile(models.Model):
 
 # --- Клас ---
 class Classroom(models.Model):
-    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_classes')
+    teacher = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='created_classes')
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=6, unique=True, editable=False)
-    students = models.ManyToManyField(User, related_name='joined_classes', blank=True)
+    students = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='joined_classes', blank=True)
 
     def save(self, *args, **kwargs):
         if not self.code:
@@ -36,7 +36,7 @@ class Quiz(models.Model):
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name='quizzes', null=True)
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -64,7 +64,7 @@ class Choice(models.Model):
 
 # --- Результат ---
 class Result(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, null=True)
     score = models.IntegerField()

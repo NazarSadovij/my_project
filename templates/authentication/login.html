@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Вхід{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Вхід</h2>
+    <form method="post" class="p-4 border rounded bg-light shadow-sm">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ field.label }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <label for="username" class="form-label">Ім'я користувача</label>
+            {{ form.username|add_class:"form-control" }}
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Пароль</label>
+            {{ form.password|add_class:"form-control" }}
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">Увійти</button>
+    </form>
+    <p class="text-center mt-3">
+        Ще немає облікового запису? <a href="{% url 'register' %}">Зареєструватися</a>
+    </p>
+</div>
+{% endblock %}

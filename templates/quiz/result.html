@@ -1,7 +1,11 @@
 {% extends "base.html" %}
+
+{% block title %}Результати{% endblock %}
+
 {% block content %}
-<h1>Результат вікторини: {{ quiz.title }}</h1>
-<p>Ваш рахунок: {{ score }} / {{ total }}</p>
-<a href="{% url 'home' %}" class="btn btn-primary mt-2">На головну</a>
-<a href="{% url 'quiz_detail' quiz.id %}" class="btn btn-secondary mt-2">Назад до вікторини</a>
+<div class="container mt-4">
+    <h2>Результати: {{ quiz.title }}</h2>
+    <p>Ваш бал: {{ score }} / {{ total }}</p>
+    <a href="{% url 'home' %}" class="btn btn-secondary">Повернутися на головну</a>
+</div>
 {% endblock %}

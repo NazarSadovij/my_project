@@ -21,4 +21,5 @@ from django.urls import path, include
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("quiz.urls")),  # підключаємо всі маршрути з додатку quiz
+    path("", include("authentication.urls")),
 ]

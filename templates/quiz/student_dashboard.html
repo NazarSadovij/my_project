@@ -1,46 +1,37 @@
 {% extends "base.html" %}
 
+{% block title %}Панель учня{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
-    <h2>👨‍🎓 Панель учня</h2>
-    <hr>
+    <h2>Вітаємо, {{ request.user.username }}!</h2>
+    <h4>Приєднатися до класу</h4>
 
-    <form method="POST" class="mb-3">
+    <!-- Форма для приєднання по коду класу -->
+    <form method="post" class="mb-3">
         {% csrf_token %}
         <div class="input-group">
-            <input type="text" name="class_code" placeholder="Введіть код класу" class="form-control" required>
-            <button type="submit" class="btn btn-primary">Приєднатися</button>
+            <input type="text" name="class_code" class="form-control" placeholder="Введіть код класу" required>
+            <button class="btn btn-primary" type="submit">Приєднатись</button>
         </div>
     </form>
 
-    <h4>📘 Мої класи</h4>
+    <h4>Ваші класи</h4>
     {% if classes %}
-        {% for class in classes %}
-            <div class="card mt-3">
-                <div class="card-body">
-                    <h5>{{ class.name }}</h5>
-                    <small>Вчитель: {{ class.teacher.username }}</small>
-                    <hr>
-                    <h6>Доступні вікторини:</h6>
-                    <ul>
-                        {% for quiz in class.quizzes.all %}
-                            <li>
-                                <a href="{% url 'take_quiz' quiz.id %}">{{ quiz.title }}</a>
-                                {% with res=quiz.results.filter(user=request.user).first %}
-                                    {% if res %}
-                                        <span class="badge bg-success ms-2">{{ res.score }}/{{ res.total }}</span>
-                                    {% endif %}
-                                {% endwith %}
-                            </li>
-                        {% empty %}
-                            <li><em>Немає вікторин</em></li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
+        <ul class="list-group">
+        {% for cls in classes %}
+            <li class="list-group-item">
+                {{ cls.name }}
+                <ul>
+                {% for quiz in cls.quizzes.all %}
+                    <li><a href="{% url 'quiz_detail' quiz.id %}">{{ quiz.title }}</a></li>
+                {% endfor %}
+                </ul>
+            </li>
         {% endfor %}
+        </ul>
     {% else %}
-        <p>Ви ще не приєдналися до жодного класу.</p>
+        <p>Ви ще не приєднані до жодного класу.</p>
     {% endif %}
 </div>
 {% endblock %}
