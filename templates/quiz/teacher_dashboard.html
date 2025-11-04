@@ -1,32 +1,29 @@
-{% extends "base.html" %}
-
+{% extends 'base.html' %}
 {% block title %}Панель вчителя{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Вітаємо, {{ request.user.username }}!</h2>
-    <h4>Ваші класи</h4>
+<h2 class="mb-4">Мої класи</h2>
 
-    <!-- Форма для створення нового класу -->
-    <form method="post" class="mb-3">
+<!-- Форма створення класу -->
+<div class="mb-4">
+    <form method="post" class="d-flex gap-2">
         {% csrf_token %}
-        <div class="input-group">
-            <input type="text" name="class_name" class="form-control" placeholder="Назва нового класу" required>
-            <button class="btn btn-primary" type="submit">Створити клас</button>
-        </div>
+        <input type="text" name="class_name" class="form-control" placeholder="Назва класу" required>
+        <button type="submit" class="btn btn-primary">Створити клас</button>
     </form>
+</div>
 
-    {% if classes %}
-        <ul class="list-group">
-        {% for cls in classes %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ cls.name }} (Код: {{ cls.code }})
-                <a href="{% url 'class_results' cls.id %}" class="btn btn-sm btn-success">Результати</a>
-            </li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>У вас ще немає класів.</p>
-    {% endif %}
+<div class="row">
+    {% for class in classes %}
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm p-3">
+            <h5>{{ class.name }}</h5>
+            <p>Код класу: <strong>{{ class.code }}</strong></p>
+            <a href="{% url 'class_results' class.id %}" class="btn btn-outline-primary w-100">Переглянути результати</a>
+        </div>
+    </div>
+    {% empty %}
+    <p>У вас ще немає класів.</p>
+    {% endfor %}
 </div>
 {% endblock %}

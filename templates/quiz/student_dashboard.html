@@ -1,37 +1,39 @@
-{% extends "base.html" %}
-
+{% extends 'base.html' %}
 {% block title %}Панель учня{% endblock %}
-
 {% block content %}
-<div class="container mt-4">
-    <h2>Вітаємо, {{ request.user.username }}!</h2>
-    <h4>Приєднатися до класу</h4>
-
-    <!-- Форма для приєднання по коду класу -->
-    <form method="post" class="mb-3">
-        {% csrf_token %}
-        <div class="input-group">
-            <input type="text" name="class_code" class="form-control" placeholder="Введіть код класу" required>
-            <button class="btn btn-primary" type="submit">Приєднатись</button>
+<h2 class="mb-4">Ваші класи</h2>
+<div class="row mb-4">
+    <div class="col-md-6">
+        <form method="post" class="d-flex gap-2">
+            {% csrf_token %}
+            <input type="text" name="class_code" class="form-control" placeholder="Введіть код класу">
+            <button class="btn btn-success"><i class="bi bi-box-arrow-in-right"></i> Приєднатись</button>
+        </form>
+    </div>
+</div>
+<div class="row">
+    {% for classroom in classes %}
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ classroom.name }}</h5>
+                    <p class="card-text">Код: <strong>{{ classroom.code }}</strong></p>
+                    <h6>Вікторини:</h6>
+                    <ul class="list-group list-group-flush">
+                        {% for quiz in classroom.quizzes.all %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ quiz.title }}
+                                <a href="{% url 'take_quiz' quiz.id %}" class="btn btn-primary btn-sm"><i class="bi bi-play-circle"></i> Розпочати</a>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item">Немає вікторин</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
         </div>
-    </form>
-
-    <h4>Ваші класи</h4>
-    {% if classes %}
-        <ul class="list-group">
-        {% for cls in classes %}
-            <li class="list-group-item">
-                {{ cls.name }}
-                <ul>
-                {% for quiz in cls.quizzes.all %}
-                    <li><a href="{% url 'quiz_detail' quiz.id %}">{{ quiz.title }}</a></li>
-                {% endfor %}
-                </ul>
-            </li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>Ви ще не приєднані до жодного класу.</p>
-    {% endif %}
+    {% empty %}
+        <p>Ви ще не приєдналися до жодного класу.</p>
+    {% endfor %}
 </div>
 {% endblock %}

@@ -3,8 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Quiz, Question, Choice, Result, Classroom, UserProfile
 from django.contrib.auth.models import User
-from .forms import QuizForm, QuestionForm, ChoiceForm
-from django.forms import inlineformset_factory
+from .forms import CustomUserCreationForm, QuizForm, QuestionForm, ChoiceForm
 
 # --- Головна сторінка ---
 @login_required
@@ -24,14 +23,11 @@ def teacher_dashboard(request):
         return redirect('home')
 
     classes = Classroom.objects.filter(teacher=request.user)
-
-    # Створення нового класу
     if request.method == "POST":
         name = request.POST.get("class_name")
         if name:
             Classroom.objects.create(teacher=request.user, name=name)
-            messages.success(request, f"Клас '{name}' створено успішно!")
-
+            messages.success(request, f"Клас '{name}' створено!")
     return render(request, "quiz/teacher_dashboard.html", {"classes": classes})
 
 # --- Панель учня ---
@@ -42,7 +38,6 @@ def student_dashboard(request):
         messages.error(request, "Доступ заборонено.")
         return redirect('home')
 
-    # Приєднання до класу по коду
     if request.method == "POST":
         code = request.POST.get("class_code").upper()
         classroom = Classroom.objects.filter(code=code).first()
@@ -55,23 +50,6 @@ def student_dashboard(request):
     classes = request.user.joined_classes.all()
     return render(request, "quiz/student_dashboard.html", {"classes": classes})
 
-# --- Створення вікторини ---
-@login_required
-def create_quiz(request, class_id):
-    classroom = get_object_or_404(Classroom, id=class_id, teacher=request.user)
-    if request.method == "POST":
-        quiz_form = QuizForm(request.POST)
-        if quiz_form.is_valid():
-            quiz = quiz_form.save(commit=False)
-            quiz.created_by = request.user
-            quiz.classroom = classroom
-            quiz.save()
-            messages.success(request, "Вікторина створена!")
-            return redirect('teacher_dashboard')
-    else:
-        quiz_form = QuizForm()
-    return render(request, "quiz/create_quiz.html", {"quiz_form": quiz_form, "classroom": classroom})
-
 # --- Перегляд вікторини ---
 @login_required
 def quiz_detail(request, quiz_id):
@@ -83,7 +61,6 @@ def quiz_detail(request, quiz_id):
 def take_quiz(request, quiz_id):
     quiz = get_object_or_404(Quiz, id=quiz_id)
     questions = quiz.questions.all()
-
     if request.method == "POST":
         score = 0
         total = questions.count()
@@ -93,27 +70,40 @@ def take_quiz(request, quiz_id):
                 choice = question.choices.filter(id=selected, is_correct=True).first()
                 if choice:
                     score += 1
-
-        classroom = quiz.classroom
-        Result.objects.create(
-            user=request.user,
-            quiz=quiz,
-            classroom=classroom,
-            score=score,
-            total=total,
-        )
-
-        return render(
-            request,
-            "quiz/result.html",
-            {"quiz": quiz, "score": score, "total": total},
-        )
-
+        Result.objects.create(user=request.user, quiz=quiz, classroom=quiz.classroom, score=score, total=total)
+        return render(request, "quiz/result.html", {"quiz": quiz, "score": score, "total": total})
     return render(request, "quiz/take_quiz.html", {"quiz": quiz, "questions": questions})
 
-# --- Перегляд результатів учителем ---
+# --- Результати класу ---
 @login_required
 def class_results(request, class_id):
     classroom = get_object_or_404(Classroom, id=class_id, teacher=request.user)
     results = Result.objects.filter(classroom=classroom).select_related("user", "quiz")
     return render(request, "quiz/class_results.html", {"classroom": classroom, "results": results})
+
+# --- Створення вікторини ---
+@login_required
+def create_quiz(request, class_id):
+    classroom = get_object_or_404(Classroom, id=class_id, teacher=request.user)
+    if request.method == "POST":
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+        if title:
+            Quiz.objects.create(title=title, description=description, classroom=classroom, created_by=request.user)
+            messages.success(request, f"Вікторина '{title}' створена!")
+            return redirect('teacher_dashboard')
+    return render(request, "quiz/create_quiz.html", {"classroom": classroom})
+
+# --- Реєстрація ---
+def register(request):
+    if request.method == "POST":
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            role = form.cleaned_data.get("role")
+            UserProfile.objects.create(user=user, role=role)
+            messages.success(request, "Реєстрація успішна!")
+            return redirect('login')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, "quiz/register.html", {"form": form})

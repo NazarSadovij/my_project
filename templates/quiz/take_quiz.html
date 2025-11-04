@@ -1,26 +1,33 @@
-{% extends "base.html" %}
-
-{% block title %}Проходження вікторини{% endblock %}
-
+{% extends 'base.html' %}
+{% block title %}{{ quiz.title }}{% endblock %}
 {% block content %}
-<div class="container mt-4">
-    <h2>{{ quiz.title }}</h2>
-    <form method="post">
-        {% csrf_token %}
-        {% for question in questions %}
-            <div class="mb-4">
-                <h5>{{ forloop.counter }}. {{ question.text }}</h5>
-                {% for choice in question.choices.all %}
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="{{ question.id }}" id="choice{{ choice.id }}" value="{{ choice.id }}">
-                        <label class="form-check-label" for="choice{{ choice.id }}">
-                            {{ choice.text }}
-                        </label>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm p-4 mb-4">
+            <h3 class="text-center mb-3">{{ quiz.title }}</h3>
+            <p class="text-center text-muted">{{ quiz.description }}</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            {% for question in questions %}
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Питання {{ forloop.counter }}:</h5>
+                        <p>{{ question.text }}</p>
+                        <div class="list-group">
+                            {% for choice in question.choices.all %}
+                                <label class="list-group-item">
+                                    <input type="radio" name="{{ question.id }}" value="{{ choice.id }}" class="form-check-input me-2">
+                                    {{ choice.text }}
+                                </label>
+                            {% endfor %}
+                        </div>
                     </div>
-                {% endfor %}
-            </div>
-        {% endfor %}
-        <button type="submit" class="btn btn-success">Завершити вікторину</button>
-    </form>
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-check2-circle"></i> Завершити вікторину</button>
+        </form>
+    </div>
 </div>
 {% endblock %}

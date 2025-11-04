@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Вікторини класу {{ classroom.name }}{% endblock %}
+{% block content %}
+<h2>Вікторини класу {{ classroom.name }}</h2>
+<ul>
+    {% for quiz in quizzes %}
+        <li>
+            {{ quiz.title }} — 
+            <a href="{% url 'take_quiz' quiz.id %}">Розпочати</a>
+        </li>
+    {% empty %}
+        <li>У цьому класі ще немає вікторин</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'student_dashboard' %}">Назад</a>
+{% endblock %}

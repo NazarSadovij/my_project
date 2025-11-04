@@ -1,10 +1,18 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% block title %}Додати варіант{% endblock %}
 {% block content %}
-<h1>Додати варіант до питання: "{{ question.text }}"</h1>
+<h2>Додати варіант до питання "{{ question.text }}"</h2>
 <form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit" class="btn btn-success">Додати</button>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Додати варіант</button>
 </form>
-<a href="{% url 'quiz_detail' question.quiz.id %}" class="btn btn-secondary mt-3">Назад</a>
+
+<h3>Всі варіанти</h3>
+<ul>
+    {% for c in choices %}
+        <li>{{ c.text }} {% if c.is_correct %}(вірно){% endif %}</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'add_question' question.quiz.id %}">Назад до питань</a>
 {% endblock %}
