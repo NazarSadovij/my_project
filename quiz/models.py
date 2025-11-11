@@ -1,5 +1,7 @@
-from django.db import models
+from django.db import models 
 from django.conf import settings
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 import random, string
 
 # --- Розширення користувача ---
@@ -73,3 +75,10 @@ class Result(models.Model):
 
     def __str__(self):
         return f"{self.user.username} — {self.quiz.title} ({self.score}/{self.total})"
+
+
+# --- 🔔 Сигнал для автоматичного створення профілю ---
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)

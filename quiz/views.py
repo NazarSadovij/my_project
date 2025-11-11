@@ -7,12 +7,13 @@ from .forms import CustomUserCreationForm, QuizForm, QuestionForm, ChoiceForm
 
 # --- Головна сторінка ---
 @login_required
+@login_required
 def home(request):
-    profile = get_object_or_404(UserProfile, user=request.user)
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
     if profile.role == 'teacher':
         return redirect('teacher_dashboard')
-    else:
-        return redirect('student_dashboard')
+    return redirect('student_dashboard')
+
 
 # --- Панель вчителя ---
 @login_required
